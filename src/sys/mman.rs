@@ -524,7 +524,7 @@ pub unsafe fn msync(addr: *mut c_void, length: size_t, flags: MsFlags) -> Result
     Errno::result(libc::msync(addr, length, flags.bits())).map(drop)
 }
 
-#[cfg(not(target_os = "android"))]
+#[cfg(not(any(target_os = "android", target_env="ohos")))]
 feature! {
 #![feature = "fs"]
 /// Creates and opens a new, or opens an existing, POSIX shared memory object.
@@ -559,7 +559,7 @@ pub fn shm_open<P>(
 /// For more information, see [`shm_unlink(3)`].
 ///
 /// [`shm_unlink(3)`]: https://man7.org/linux/man-pages/man3/shm_unlink.3.html
-#[cfg(not(target_os = "android"))]
+#[cfg(not(any(target_os = "android", target_env="ohos")))]
 pub fn shm_unlink<P: ?Sized + NixPath>(name: &P) -> Result<()> {
     let ret = name.with_nix_path(|cstr| {
         unsafe { libc::shm_unlink(cstr.as_ptr()) }

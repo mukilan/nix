@@ -31,9 +31,11 @@ type fs_type_t = libc::c_ulong;
 type fs_type_t = libc::c_uint;
 #[cfg(all(target_os = "linux", target_env = "musl"))]
 type fs_type_t = libc::c_ulong;
+#[cfg(all(target_os = "linux", target_env = "ohos"))]
+type fs_type_t = libc::c_ulong;
 #[cfg(all(target_os = "linux", target_env = "uclibc"))]
 type fs_type_t = libc::c_int;
-#[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc"))))]
+#[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc", target_env="ohos"))))]
 type fs_type_t = libc::__fsword_t;
 
 /// Describes the file system type as known by the operating system.
@@ -42,7 +44,8 @@ type fs_type_t = libc::__fsword_t;
     target_os = "android",
     all(target_os = "linux", target_arch = "s390x"),
     all(target_os = "linux", target_env = "musl"),
-    all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl"))),
+    all(target_os = "linux", target_env = "ohos"),
+    all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env="ohos"))),
 ))]
 #[derive(Eq, Copy, Clone, PartialEq, Debug)]
 pub struct FsType(pub fs_type_t);
@@ -252,7 +255,7 @@ impl Statfs {
     /// Optimal transfer block size
     #[cfg(any(
         target_os = "android",
-        all(target_os = "linux", target_env = "musl")
+        all(target_os = "linux", any(target_env = "musl", target_env="ohos"))
     ))]
     #[cfg_attr(docsrs, doc(cfg(all())))]
     pub fn optimal_transfer_size(&self) -> libc::c_ulong {
@@ -260,7 +263,7 @@ impl Statfs {
     }
 
     /// Optimal transfer block size
-    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc"))))]
+    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc", target_env="ohos"))))]
     #[cfg_attr(docsrs, doc(cfg(all())))]
     pub fn optimal_transfer_size(&self) -> libc::__fsword_t {
         self.0.f_bsize
@@ -304,7 +307,7 @@ impl Statfs {
 
     /// Size of a block
     // f_bsize on linux: https://github.com/torvalds/linux/blob/master/fs/nfs/super.c#L471
-    #[cfg(all(target_os = "linux", target_env = "musl"))]
+    #[cfg(all(target_os = "linux", any(target_env = "musl", target_env="ohos")))]
     #[cfg_attr(docsrs, doc(cfg(all())))]
     pub fn block_size(&self) -> libc::c_ulong {
         self.0.f_bsize
@@ -320,7 +323,7 @@ impl Statfs {
 
     /// Size of a block
     // f_bsize on linux: https://github.com/torvalds/linux/blob/master/fs/nfs/super.c#L471
-    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc"))))]
+    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc", target_env="ohos"))))]
     #[cfg_attr(docsrs, doc(cfg(all())))]
     pub fn block_size(&self) -> libc::__fsword_t {
         self.0.f_bsize
@@ -376,7 +379,7 @@ impl Statfs {
     }
 
     /// Maximum length of filenames
-    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc"))))]
+    #[cfg(all(target_os = "linux", not(any(target_arch = "s390x", target_env = "musl", target_env = "uclibc", target_env="ohos"))))]
     #[cfg_attr(docsrs, doc(cfg(all())))]
     pub fn maximum_name_length(&self) -> libc::__fsword_t {
         self.0.f_namelen
